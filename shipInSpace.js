@@ -1,5 +1,10 @@
-var canvas = document.getElementById("shipInSpace");
-var context = canvas.getContext("2d");
-
-context.fillStyle = "black";
-context.strokeStyle = "red";
+var canvas = document.createElement("canvas");
+var ctx = canvas.getContext("2d");
+ctx.fillStyle = "black";
+ctx.strokeStyle = "red";
+canvas.width = 900;
+canvas.height = 600;
+canvas.style.border = "1px solid black";
+canvas.style.display = "block";
+canvas.style.margin = "20px auto";
+document.getElementById("game").appendChild(canvas);

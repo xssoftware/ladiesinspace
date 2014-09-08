@@ -26,11 +26,6 @@ shipImage.onload = function () {
 };
 shipImage.src = "img/spaceship1_final.png";
 
-// Game objects
-var ship = {
-    speed: 256 // movement speed
-};
-
 // Handle keyboard controls
 var keysDown = {};
 
@@ -42,29 +37,35 @@ addEventListener("keyup", function (e) {
     delete keysDown[e.keyCode];
 });
 
-var reset = function () {
-    ship.x = canvas.width / 2;
-    ship.y = canvas.height - canvas.height/6;
-};
+// Game objects
+var ship = {
 
-// Update game objects
-var update = function (modifier) {
+    // Properties
+    speed: 256, // movement speed
 
-    if (38 in keysDown) { // Player holding up
-        ship.y -= ship.speed * modifier;
+    // Methods
+    update: function (modifier) {
 
-    }
-    if (40 in keysDown) { // Player holding down
-        ship.y += ship.speed * modifier;
+        if (38 in keysDown) { // Player holding up
+            ship.y -= ship.speed * modifier;
 
-    }
-    if (37 in keysDown) { // Player holding left
-        ship.x -= ship.speed * modifier;
+        }
+        if (40 in keysDown) { // Player holding down
+            ship.y += ship.speed * modifier;
 
-    }
-    if (39 in keysDown) { // Player holding right
-        ship.x += ship.speed * modifier;
+        }
+        if (37 in keysDown) { // Player holding left
+            ship.x -= ship.speed * modifier;
 
+        }
+        if (39 in keysDown) { // Player holding right
+            ship.x += ship.speed * modifier;
+
+        }
+    },
+    reset: function () {
+        ship.x = canvas.width / 2;
+        ship.y = canvas.height - canvas.height / 6;
     }
 };
 
@@ -85,7 +86,7 @@ var main = function () {
     var now = Date.now();
     var delta = now - then;
 
-    update(delta / 1000);
+    ship.update(delta / 1000);
     render();
 
     then = now;
@@ -93,7 +94,8 @@ var main = function () {
     // Request to do this again ASAP
     requestAnimationFrame(main);
 };
+
 var then = Date.now();
-reset();
+ship.reset();
 main();
 

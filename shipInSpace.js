@@ -26,6 +26,30 @@ shipImage.onload = function () {
 };
 shipImage.src = "img/spaceship1_final.png";
 
+// class Asteroid
+function Asteroid(speed, endurance, direction, size){
+  this.speed = speed;
+  this.endurance = endurance;
+  this.direction = direction;
+  this.size = size;
+}
+
+//class Bullet
+function Bullet(){
+  // bullet image
+  this.bulletReady = false;
+  this.bulletImage = new Image();
+  this.bulletImage.onload = function(){
+    this.bulletReady = true;
+  }
+  this.bulletImage.src = "img/bullet.png";
+
+  // bullet coordinates
+  this.x = canvas.width / 2;
+  this.y = canvas.height - canvas.height / 6;
+} // to be continue
+
+
 // Handle keyboard controls
 var keysDown = {};
 
@@ -36,6 +60,7 @@ addEventListener("keydown", function (e) {
 addEventListener("keyup", function (e) {
     delete keysDown[e.keyCode];
 });
+
 
 // Game objects
 var ship = {
@@ -81,8 +106,8 @@ var render = function () {
     if (shipReady) {
         context.drawImage(shipImage, ship.x, ship.y);
     }
-
 };
+
 
 // The main game loop
 var main = function () {

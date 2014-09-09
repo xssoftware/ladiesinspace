@@ -26,6 +26,15 @@ shipImage.onload = function () {
 };
 shipImage.src = "img/spaceship1_final.png";
 
+// bullet image
+var bulletReady = false;
+var bulletImage = new Image();
+bulletImage.onload = function(){
+  this.bulletReady = true;
+}
+bulletImage.src = "img/bullet.png";
+
+
 // class Asteroid
 function Asteroid(speed, endurance, direction, size){
   this.speed = speed;
@@ -36,17 +45,15 @@ function Asteroid(speed, endurance, direction, size){
 
 //class Bullet
 function Bullet(){
-  // bullet image
-  this.bulletReady = false;
-  this.bulletImage = new Image();
-  this.bulletImage.onload = function(){
-    this.bulletReady = true;
-  }
-  this.bulletImage.src = "img/bullet.png";
-
+  this.bulletImg = bulletImage;
   // bullet coordinates
-  this.x = canvas.width / 2;
-  this.y = canvas.height - canvas.height / 6;
+  this.x = ship.x;
+  this.y = ship.y;
+
+  this.speed = 250;
+  this.move = function(modifier){
+    this.y -= this.speed * modifier;
+  }
 } // to be continue
 
 

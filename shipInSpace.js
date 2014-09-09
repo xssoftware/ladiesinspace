@@ -134,3 +134,13 @@ var then = Date.now();
 ship.reset();
 main();
 
+function detectCollision(firstObj, secondObj)
+{
+    if ((firstObj.x <= secondObj.x && firstObj.x + 32 >= secondObj.x) && 
+        (firstObj.y <= secondObj.y && secondObj.y + 32 >= secondObj)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}

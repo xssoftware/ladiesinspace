@@ -84,6 +84,12 @@ var ship = {
             else {
                 ship.y -= ship.speed * modifier;
             }
+             if (40 in keysDown) { // Player holding down
+                 ship.y -= ship.speed * modifier / 4.5;
+             }
+             else {
+              ship.y -= ship.speed * modifier;
+             }
         }
         if (40 in keysDown) { // Player holding down
             ship.y -= ship.speed * modifier / 4.5;

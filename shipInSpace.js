@@ -30,7 +30,7 @@ shipImage.src = "img/spaceship1_final.png";
 var bulletReady = false;
 var bulletImage = new Image();
 bulletImage.onload = function(){
-  this.bulletReady = true;
+  bulletReady = true;
 }
 bulletImage.src = "img/bullet.png";
 
@@ -45,10 +45,9 @@ function Asteroid(speed, endurance, direction, size){
 
 //class Bullet
 function Bullet(){
-  this.bulletImg = bulletImage;
   // bullet coordinates
-  this.x = ship.x;
-  this.y = ship.y;
+  this.x = ship.x + 30;
+  this.y = ship.y - 10;
 
   this.speed = 250;
   this.move = function(modifier){
@@ -79,15 +78,15 @@ var ship = {
     update: function (modifier) {
 
         if (38 in keysDown) { // Player holding up
-            // if (40 in keysDown) { // Player holding down
-            //     ship.y -= ship.speed * modifier / 4.5;
-            // }
-            // else {
+            if (40 in keysDown) { // Player holding down
+                ship.y -= ship.speed * modifier / 4.5;
+            }
+            else {
                 ship.y -= ship.speed * modifier;
-            // }
+            }
         }
         if (40 in keysDown) { // Player holding down
-            ship.y += ship.speed * modifier / 4.5;
+            ship.y -= ship.speed * modifier / 4.5;
         }
         if (37 in keysDown) { // Player holding left
             ship.x -= ship.speed * modifier;
@@ -104,6 +103,23 @@ var ship = {
     }
 };
 
+// bullet objects
+var bullets = [], i = 0;
+  // create bullets
+var createBullets = function(){
+  if(66 in keysDown){
+    if(bulletReady){
+      bullets[i] = new Bullet();
+    }
+    context.drawImage(bulletImage, bullets[i].x, bullets[i].y);
+    console.log(bullets[i].x, bullets[i].y);
+      console.log(bullets);
+    bullets[i].move();
+    i++;
+  }
+}
+
+// FUNCTIONS
 // Draw everything
 var render = function () {
     if (bgReady) {
@@ -115,6 +131,18 @@ var render = function () {
     }
 };
 
+//detect collision between two objects
+function detectCollision(firstObj, secondObj)
+{
+    if ((firstObj.x <= secondObj.x && firstObj.x + 32 >= secondObj.x) &&
+        (firstObj.y <= secondObj.y && secondObj.y + 32 >= secondObj)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 
 // The main game loop
 var main = function () {
@@ -123,6 +151,7 @@ var main = function () {
 
     ship.update(delta / 1000);
     render();
+    createBullets();
 
     then = now;
 
@@ -134,13 +163,3 @@ var then = Date.now();
 ship.reset();
 main();
 
-function detectCollision(firstObj, secondObj)
-{
-    if ((firstObj.x <= secondObj.x && firstObj.x + 32 >= secondObj.x) && 
-        (firstObj.y <= secondObj.y && secondObj.y + 32 >= secondObj)) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}

@@ -75,9 +75,7 @@ addEventListener("keyup", function (e) {
 var bullets = [],
     asteroids = [],
     enemies = [],
-    enemyBullets = [],
-    time = 120,
-    gap = 70;
+    enemyBullets = [];
 
 var bg = {
     x: 0,
@@ -91,6 +89,8 @@ var ship = {
     // Properties
     speed: 256, // movement speed
     health: 100,
+    time: 12,
+    gap: 13,
 
     // Methods
     update: function (modifier) {
@@ -118,8 +118,13 @@ var ship = {
 
         }
         if (32 in keysDown) {
-            var newBul = bullet.newBullet(ship.x + 30, ship.y - 40);
-            bullets.push(newBul);
+            if (ship.gap > ship.time) {
+                var newBul = bullet.newBullet(ship.x + 30, ship.y - 40);
+                bullets.push(newBul);
+                ship.gap = 0;
+            } else {
+                ship.gap++;
+            }
         }
     },
 
@@ -133,6 +138,9 @@ var ship = {
 };
 
 var bullet = {
+
+    time: 120,
+    gap: 70,
 
     newBullet: function(x, y) {
         this.x = x;
@@ -153,17 +161,17 @@ var bullet = {
    },
 
     update: function() {
-        if (gap > time) {
+        if (bullet.gap > bullet.time) {
             for (var i = 0; i < enemies.length; i++) {
                 if (enemies[i].y < 900) {
                     var newEnemyBul = bullet.newBullet(enemies[i].x + 20, enemies[i].y + 55);
                     enemyBullets.push(newEnemyBul);
                 }
             }
-            gap = 0;
+            bullet.gap = 0;
         }
         else {
-            gap++;
+            bullet.gap++;
         }
     }
 };
@@ -227,6 +235,15 @@ var enemy = {
                 for (var j = 0; j < enemies.length; j++) {
                     if (map.collision(bullets[i], enemies[j], 7, 14)) {
                         enemies.splice(j, 1);
+                    }
+                }
+            }
+        }
+        else {
+            for (var i = 0; i < enemies.length; i++) {
+                for (var j = 0; j < bullets.length; j++) {
+                    if (map.collision(bullets[j], enemies[i], 7, 14)) {
+                        enemies.splice(i, 1);
                     }
                 }
             }

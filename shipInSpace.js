@@ -24,7 +24,7 @@ var shipImage = new Image();
 shipImage.onload = function () {
     shipReady = true;
 };
-shipImage.src = "img/spaceship1_final.png";
+shipImage.src = "img/ship.png";
 
 // bullet image
 var bulletReady = false;
@@ -204,7 +204,23 @@ var enemy = {
     }
 };
 
+var map = {
+    collision: function (firstObj, secondObj)
+    {
+        return ((firstObj.x <= secondObj.x && firstObj.x + 32 >= secondObj.x) &&
+            (firstObj.y <= secondObj.y && secondObj.y + 32 >= secondObj));
+    },
 
+    borders: function () {
+        if (ship.x <= 0) {
+            ship.x = 0;
+        }
+
+        if (ship.x >= 900 - 64) {
+            ship.x = 900 - 64;
+        }
+    }
+};
 
 // FUNCTIONS
 
@@ -237,6 +253,7 @@ var render = function () {
 
     if (shipReady) {
         context.drawImage(shipImage, ship.x, ship.y);
+        map.borders();
     }
 
     if (bulletReady) {
@@ -257,13 +274,6 @@ var render = function () {
         draw (bullet, enemyBulletImage, enemyBullets, 2);
     }
 };
-
-//detect collision between two objects
-function detectCollision(firstObj, secondObj)
-{
-    return ((firstObj.x <= secondObj.x && firstObj.x + 32 >= secondObj.x) &&
-        (firstObj.y <= secondObj.y && secondObj.y + 32 >= secondObj));
-}
 
 // The main game loop
 var main = function () {

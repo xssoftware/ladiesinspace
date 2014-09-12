@@ -246,7 +246,8 @@ var asteroid = {
         }
 
         var small = [],
-            medium = [];
+            medium = [],
+            obj = {};
 
        for (var i = bullets.length - 1; i >= 0; i--) {
            for (var j = asteroids.length - 1; j >= 0; j--) {
@@ -273,11 +274,11 @@ var asteroid = {
                     var x = asteroids[small[s]].x;
                     var y = asteroids[small[s]].y;
                     var obj = asteroid.newAsteroid();
-                    obj.x = x;
+                    obj.x = x - 50;
                     obj.y = y;
-                    obj.size = 5;
+                    obj.size = 15;
                     obj.image = smallImage;
-                    asteroids.splice(small[i], 1);
+                    delete asteroids[small[i]]; //= false;
                     asteroids.push(obj);
                     obj.x = obj.x + 100;
                     asteroids.push(obj);
@@ -289,18 +290,24 @@ var asteroid = {
         if (medium.length > 0) {
             for (var s = medium.length - 1; s >= 0; s--) {
                 if (asteroids[medium[s]] != undefined) {
-                    x = asteroids[medium[s]].x;
-                    y = asteroids[medium[s]].y;
-                    obj = asteroid.newAsteroid();
-                    obj.x = x;
+                    var x = asteroids[medium[s]].x;
+                    var y = asteroids[medium[s]].y;
+                    var obj = asteroid.newAsteroid();
+                    obj.x = x - 50;
                     obj.y = y;
                     obj.size = 15;
                     obj.image = middleImage;
-                    asteroids.splice(medium[i], 1);
+                    delete asteroids[medium[i]]; //= false;
                     asteroids.push(obj);
                     obj.x = obj.x + 100;
                     asteroids.push(obj);
                 }
+            }
+        }
+
+        for (var i = asteroids.length - 1; i > 0; i--) {
+            if (asteroids[i] == undefined) {
+                asteroids.splice(i, 1);
             }
         }
    }
@@ -348,7 +355,7 @@ var map = {
     collision: function (firstObj, secondObj, w, h)
     {
         if (firstObj != undefined && secondObj != undefined) {
-            return (firstObj.y <= secondObj.y + h && firstObj.x <= secondObj.x);
+            return (firstObj.y <= secondObj.y + h && firstObj.x > secondObj.x && firstObj.x <= secondObj.x + w);
         }
     },
 

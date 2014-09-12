@@ -42,6 +42,22 @@ asteroidImage.onload = function(){
 };
 asteroidImage.src = "img/asteroid.png";
 
+// enemy image
+var enemyReady = false;
+var enemyImage = new Image();
+enemyImage.onload = function(){
+    enemyReady = true;
+};
+enemyImage.src = "img/enemy.png";
+
+// enemyBullet image
+var enemyBulletReady = false;
+var enemyBulletImage = new Image();
+enemyBulletImage.onload = function(){
+    enemyBulletReady = true;
+};
+enemyBulletImage.src = "img/enemyBullet.png";
+
 // Handle keyboard controls
 var keysDown = {};
 
@@ -58,6 +74,8 @@ addEventListener("keyup", function (e) {
 
 var bullets = [];
 var asteroids = [];
+var enemies = [];
+var enemyBullets = [];
 
 var ship = {
 
@@ -72,6 +90,16 @@ var ship = {
         if (r > 99370) {
             var newAsteroid = asteroid.newAsteroid();
             asteroids.push(newAsteroid);
+        }
+
+        if (r > 99270 && r < 99370) {
+            var newEnemy = enemy.newEnemy();
+            enemies.push(newEnemy);
+        }
+
+        for (var i = 0; i < enemies.length; i++) {
+            var newEnemyBul = bullet.newEnemyBullet(enemies[i]);
+            enemyBullets.push(newEnemyBul);
         }
 
         if (38 in keysDown) { // Player holding up
@@ -112,9 +140,21 @@ var bullet = {
       bul.y -= bul.speed * 0.008;
    },
 
+    enemyBulMove: function (bul){
+        bul.y += 85;
+    },
+
     newBullet: function() {
         this.x = ship.x + 30;
         this.y = ship.y - 40;
+        this.speed = 256;
+
+        return {x: this.x, y: this.y, speed: this.speed};
+    },
+
+    newEnemyBullet: function(enemy) {
+        this.x = enemy.x + 30;
+        this.y = enemy.y - 40;
         this.speed = 256;
 
         return {x: this.x, y: this.y, speed: this.speed};
@@ -139,6 +179,25 @@ var asteroid = {
 
     astMove: function(ast) {
         ast.y += 1;
+    }
+};
+
+var enemy = {
+
+    rand: getRandomInt(1, 3),
+
+    newEnemy: function() {
+        this.speed = 0.04;
+        this.health = this.rand;
+        this.size = this.rand;
+        this.x = getRandomInt(50, 800);
+        this.y = getRandomInt(1, 100);
+
+        return {x: this.x, y: this.y, speed: this.speed, health: this.health, size: this.size};
+    },
+
+    enemyMove: function(enemy) {
+        enemy.y += 1;
     }
 };
 
@@ -182,6 +241,26 @@ var render = function () {
 //            }
             context.drawImage(asteroidImage, asteroids[i].x, asteroids[i].y);
             asteroid.astMove(asteroids[i]);
+        }
+    }
+
+    if (enemyReady) {
+        for (var i = 0; i < enemies.length; i++) {
+//            if (asteroids[i].y > 600) {
+//                delete bullets[i];
+//            }
+            context.drawImage(enemyImage, enemies[i].x, enemies[i].y);
+            enemy.enemyMove(enemies[i]);
+        }
+    }
+
+    if (enemyBulletReady) {
+        for (var i = 0; i < enemyBullets.length; i++) {
+//            if (bullets[i].y < 0 && i > 1) {
+//                //delete bullets[i];
+//            }
+            context.drawImage(enemyBulletImage, enemyBullets[i].x, enemyBullets[i].y);
+            bullet.enemyBulMove(enemyBullets[i]);
         }
     }
 };

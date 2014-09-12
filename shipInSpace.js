@@ -213,8 +213,7 @@ var asteroid = {
 
     newAsteroid: function() {
         var rand = getRandomInt(1, 30);
-        this.health = getRandomInt(1, 30);
-        this.size = getRandomInt(1, 30);
+        this.size = rand;
         this.x = getRandomInt(50, 800);
         this.y = getRandomInt(1, 20);
         this.dir = 2;
@@ -245,13 +244,32 @@ var asteroid = {
             var newAsteroid = asteroid.newAsteroid();
             asteroids.push(newAsteroid);
         }
-    }
+
+       for (var i = bullets.length - 1; i >= 0; i--) {
+           for (var j = asteroids.length - 1; j >= 0; j--) {
+               if (map.collision(bullets[i], asteroids[j], 7, 14) && asteroids[j].size <= 10) {
+                   asteroids.splice(j, 1);
+                   bullets.splice(i, 1);
+               }
+
+               else if (map.collision(bullets[i], asteroids[j], 7, 14) && asteroids[j].size > 10 && asteroids[j].size <= 20) {
+                   asteroids.splice(j, 1);
+                   bullets.splice(i, 1);
+               }
+
+               else if (map.collision(bullets[i], asteroids[j], 7, 14) && asteroids[j].size > 20 && asteroids[j].size <= 30) {
+                   asteroids.splice(j, 1);
+                   bullets.splice(i, 1);
+               }
+           }
+       }
+   }
 };
 
 var enemy = {
 
     newEnemy: function() {
-        this.health = 1;
+
         this.x = getRandomInt(50, 800);
         this.y = getRandomInt(1, 20);
         this.image = enemyImage;
@@ -317,9 +335,15 @@ function getRandomInt(min, max) {
 
 function draw (obj, input) {
     for (var i = 0; i < input.length; i++) {
-        if (input[i].y > 600) {
+        if (input[i].y > 600 && input[i].dir == 2) {
             input.splice(i, 1);
-        } else {
+        }
+
+        else if (input[i].y < 0 && input[i].dir == 1) {
+            input.splice(i, 1);
+        }
+
+        else {
             context.drawImage(input[i].image, input[i].x, input[i].y);
             obj.move(input[i], input[i].dir);
         }

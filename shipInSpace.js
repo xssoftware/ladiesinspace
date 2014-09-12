@@ -344,7 +344,7 @@ var enemy = {
 
         for (var i = bullets.length - 1; i >= 0; i--) {
             for (var j = enemies.length - 1; j >= 0; j--) {
-                if (map.collision(bullets[i], enemies[j], 7, 14)) {
+                if (map.collision(bullets[i], enemies[j], 50, 50)) {
                     enemies.splice (j, 1);
                     bullets.splice (i, 1);
                 }

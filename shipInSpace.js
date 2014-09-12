@@ -95,34 +95,6 @@ var ship = {
     // Methods
     update: function (modifier) {
 
-        var r = Math.random() * 100000;
-
-        if (r > 99700) {
-            var newAsteroid = asteroid.newAsteroid();
-            asteroids.push(newAsteroid);
-        }
-
-        if (r > 99200 && r < 99370) {
-            var newEnemy = enemy.newEnemy();
-            enemies.push(newEnemy);
-
-            var newEnemyBul = bullet.newBullet(enemies[enemies.length - 1].x + 20, enemies[enemies.length - 1].y + 55);
-            enemyBullets.push(newEnemyBul);
-        }
-
-        if (gap > time) {
-            for (var i = 0; i < enemies.length; i++) {
-                if (enemies[i].y < 900) {
-                    newEnemyBul = bullet.newBullet(enemies[i].x + 20, enemies[i].y + 55);
-                    enemyBullets.push(newEnemyBul);
-                }
-            }
-            gap = 0;
-        }
-        else {
-            gap++;
-        }
-
         if (38 in keysDown) { // Player holding up
              if (40 in keysDown) { // Player holding down
                  bg.y += ship.speed * modifier / 4.5;
@@ -162,6 +134,14 @@ var ship = {
 
 var bullet = {
 
+    newBullet: function(x, y) {
+        this.x = x;
+        this.y = y;
+        this.speed = 256;
+
+        return {x: this.x, y: this.y, speed: this.speed};
+    },
+
    move: function (bul, dir){
        if (dir == 1) {
            bul.y -= bul.speed * 0.008;
@@ -172,13 +152,20 @@ var bullet = {
        }
    },
 
-    newBullet: function(x, y) {
-        this.x = x;
-        this.y = y;
-        this.speed = 256;
-
-        return {x: this.x, y: this.y, speed: this.speed};
+    update: function() {
+        if (gap > time) {
+            for (var i = 0; i < enemies.length; i++) {
+                if (enemies[i].y < 900) {
+                    var newEnemyBul = bullet.newBullet(enemies[i].x + 20, enemies[i].y + 55);
+                    enemyBullets.push(newEnemyBul);
+                }
+            }
+            gap = 0;
         }
+        else {
+            gap++;
+        }
+    }
 };
 
 //{(speed, endurance, direction, size)
@@ -198,6 +185,15 @@ var asteroid = {
 
     move: function(ast) {
         ast.y += 1;
+    },
+
+    update: function () {
+        var r = Math.random() * 100000;
+
+        if (r > 99700) {
+            var newAsteroid = asteroid.newAsteroid();
+            asteroids.push(newAsteroid);
+        }
     }
 };
 
@@ -213,14 +209,36 @@ var enemy = {
 
     move: function(enemy) {
         enemy.y += 1;
+    },
+
+    update: function() {
+        var r = Math.random() * 100000;
+
+        if (r > 99200 && r < 99370) {
+            var newEnemy = enemy.newEnemy();
+            enemies.push(newEnemy);
+
+            var newEnemyBul = bullet.newBullet(enemies[enemies.length - 1].x + 20, enemies[enemies.length - 1].y + 55);
+            enemyBullets.push(newEnemyBul);
+        }
+
+        if (bullets.length <= enemies.length) {
+            for (var i = 0; i < bullets.length; i++) {
+                for (var j = 0; j < enemies.length; j++) {
+                    if (map.collision(bullets[i], enemies[j], 7, 14)) {
+                        enemies.splice(j, 1);
+                    }
+                }
+            }
+        }
     }
 };
 
 var map = {
-    collision: function (firstObj, secondObj)
+    collision: function (firstObj, secondObj, w, h)
     {
-        return ((firstObj.x <= secondObj.x && firstObj.x + 32 >= secondObj.x) &&
-            (firstObj.y <= secondObj.y && secondObj.y + 32 >= secondObj));
+        return ((firstObj.x <= secondObj.x && firstObj.x + w >= secondObj.x) &&
+            (firstObj.y <= secondObj.y && secondObj.y + h >= secondObj));
     },
 
     borders: function () {
@@ -301,6 +319,9 @@ var main = function () {
     var delta = now - then;
 
     ship.update(delta / 1000);
+    asteroid.update();
+    enemy.update();
+    bullet.update();
     render();
 
     then = now;

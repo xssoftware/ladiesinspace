@@ -34,13 +34,13 @@ bulletImage.onload = function(){
 };
 bulletImage.src = "img/bullet.png";
 
-// asteroid image
-var asteroidReady = false;
-var asteroidImage = new Image();
-asteroidImage.onload = function(){
-    asteroidReady = true;
+// enemyBullet image
+var enemyBulletReady = false;
+var enemyBulletImage = new Image();
+enemyBulletImage.onload = function(){
+    enemyBulletReady = true;
 };
-asteroidImage.src = "img/asteroid.png";
+enemyBulletImage.src = "img/enemyBullet.png";
 
 // enemy image
 var enemyReady = false;
@@ -50,13 +50,13 @@ enemyImage.onload = function(){
 };
 enemyImage.src = "img/enemy.png";
 
-// enemyBullet image
-var enemyBulletReady = false;
-var enemyBulletImage = new Image();
-enemyBulletImage.onload = function(){
-    enemyBulletReady = true;
+// asteroid image
+var asteroidReady = false;
+var asteroidImage = new Image();
+asteroidImage.onload = function(){
+    asteroidReady = true;
 };
-enemyBulletImage.src = "img/enemyBullet.png";
+asteroidImage.src = "img/asteroid.png";
 
 // Handle keyboard controls
 var keysDown = {};
@@ -72,12 +72,12 @@ addEventListener("keyup", function (e) {
 
 // Game objects
 
-var bullets = [];
-var asteroids = [];
-var enemies = [];
-var enemyBullets = [];
-var time = 120;
-var gap = 70;
+var bullets = [],
+    asteroids = [],
+    enemies = [],
+    enemyBullets = [],
+    time = 120,
+    gap = 70;
 
 var ship = {
 
@@ -98,6 +98,7 @@ var ship = {
         if (r > 99200 && r < 99370) {
             var newEnemy = enemy.newEnemy();
             enemies.push(newEnemy);
+
             var newEnemyBul = bullet.newBullet(enemies[enemies.length - 1].x + 20, enemies[enemies.length - 1].y + 55);
             enemyBullets.push(newEnemyBul);
         }
@@ -114,8 +115,6 @@ var ship = {
         else {
             gap++;
         }
-
-       // console.log(enemyBullets);
 
         if (38 in keysDown) { // Player holding up
              if (40 in keysDown) { // Player holding down
@@ -149,10 +148,9 @@ var ship = {
     }
 };
 
-
 var bullet = {
 
-   bulMove: function (bul, dir){
+   move: function (bul, dir){
        if (dir == 1) {
            bul.y -= bul.speed * 0.008;
        }
@@ -178,35 +176,30 @@ var asteroid = {
     rand: getRandomInt(1, 3),
 
     newAsteroid: function() {
-        this.speed = 0.04;
         this.health = this.rand;
         this.size = this.rand;
         this.x = getRandomInt(50, 800);
         this.y = getRandomInt(1, 20);
 
-        return {x: this.x, y: this.y, speed: this.speed, health: this.health, size: this.size};
+        return {x: this.x, y: this.y, health: this.health, size: this.size};
     },
 
-    astMove: function(ast) {
+    move: function(ast) {
         ast.y += 1;
     }
 };
 
 var enemy = {
 
-    rand: getRandomInt(1, 3),
-
     newEnemy: function() {
-        this.speed = 0.04;
-        this.health = this.rand;
-        this.size = this.rand;
+        this.health = 1;
         this.x = getRandomInt(50, 800);
         this.y = getRandomInt(1, 20);
 
-        return {x: this.x, y: this.y, speed: this.speed, health: this.health, size: this.size};
+        return {x: this.x, y: this.y, health: this.health};
     },
 
-    enemyMove: function(enemy) {
+    move: function(enemy) {
         enemy.y += 1;
     }
 };
@@ -216,15 +209,27 @@ var enemy = {
 // FUNCTIONS
 
 //Random
-/**
- * Returns a random integer between min (inclusive) and max (inclusive)
- * Using Math.round() will give you a non-uniform distribution!
- */
+//Returns a random integer between min (inclusive) and max (inclusive)
+//Using Math.round() will give you a non-uniform distribution!
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 // Draw everything
+
+function draw (obj, image, input, dir) {
+    for (var i = 0; i < input.length; i++) {
+        if (input[i].y > 600) {
+            input.splice(i, 1);
+            console.log(input.length)
+        } else {
+            context.drawImage(image, input[i].x, input[i].y);
+            obj.move(input[i], dir);
+        }
+    }
+}
+
 var render = function () {
     if (bgReady) {
         context.drawImage(bgImage, 0, 0);
@@ -235,40 +240,21 @@ var render = function () {
     }
 
     if (bulletReady) {
-        for (var i = 0; i < bullets.length; i++) {
-//            if (bullets[i].y < 0 && i > 1) {
-//                //delete bullets[i];
-//            }
-            context.drawImage(bulletImage, bullets[i].x, bullets[i].y);
-            bullet.bulMove(bullets[i], 1);
-        }
+        draw (bullet, bulletImage, bullets, 1);
     }
 
     if (asteroidReady) {
-        for (var i = 0; i < asteroids.length; i++) {
-//            if (asteroids[i].y > 600) {
-//                delete bullets[i];
-//            }
-            context.drawImage(asteroidImage, asteroids[i].x, asteroids[i].y);
-            asteroid.astMove(asteroids[i]);
-        }
+        console.log (asteroids.length);
+        draw (asteroid, asteroidImage, asteroids, 2);
+        console.log (asteroids.length);
     }
 
     if (enemyReady) {
-        for (var i = 0; i < enemies.length; i++) {
-//            if (asteroids[i].y > 600) {
-//                delete bullets[i];
-//            }
-            context.drawImage(enemyImage, enemies[i].x, enemies[i].y);
-            enemy.enemyMove(enemies[i]);
-        }
+        draw (enemy, enemyImage, enemies, 2);
     }
 
     if (enemyBulletReady) {
-        for (var i = 0; i < enemyBullets.length; i++) {
-            context.drawImage(enemyBulletImage, enemyBullets[i].x, enemyBullets[i].y);
-            bullet.bulMove(enemyBullets[i], 2);
-        }
+        draw (bullet, enemyBulletImage, enemyBullets, 2);
     }
 };
 
@@ -279,7 +265,6 @@ function detectCollision(firstObj, secondObj)
         (firstObj.y <= secondObj.y && secondObj.y + 32 >= secondObj));
 }
 
-
 // The main game loop
 var main = function () {
     var now = Date.now();
@@ -287,7 +272,6 @@ var main = function () {
 
     ship.update(delta / 1000);
     render();
-
 
     then = now;
 

@@ -79,6 +79,13 @@ var bullets = [],
     time = 120,
     gap = 70;
 
+var bg = {
+    x: 0,
+    y: 0,
+    nextX: 0,
+    nextY: 0 - 600
+};
+
 var ship = {
 
     // Properties
@@ -118,14 +125,17 @@ var ship = {
 
         if (38 in keysDown) { // Player holding up
              if (40 in keysDown) { // Player holding down
-                 ship.y -= ship.speed * modifier / 4.5;
+                 bg.y += ship.speed * modifier / 4.5;
+                 bg.nextY += ship.speed * modifier / 4.5;
              }
              else {
-              ship.y -= ship.speed * modifier;
+                bg.y += ship.speed * modifier;
+                bg.nextY += ship.speed * modifier;
              }
         }
         if (40 in keysDown) { // Player holding down
-            ship.y -= ship.speed * modifier / 4.5;
+            bg.y += ship.speed * modifier / 4.5;
+            bg.nextY += ship.speed * modifier / 4.5;
         }
         if (37 in keysDown) { // Player holding left
             ship.x -= ship.speed * modifier;
@@ -145,6 +155,8 @@ var ship = {
         ship.x = canvas.width / 2;
         ship.y = canvas.height - canvas.height / 6;
         ship.health = 100;
+        bg.x = 0;
+        bg.y = 0;
     }
 };
 
@@ -248,7 +260,15 @@ function draw (obj, image, input, dir) {
 
 var render = function () {
     if (bgReady) {
-        context.drawImage(bgImage, 0, 0);
+        if (bg.y > 600) {
+            bg.y = 0 - 600;
+        }
+
+        if (bg.nextY > 600) {
+            bg.nextY = 0 - 600;
+        }
+        context.drawImage(bgImage, bg.nextX, bg.nextY);
+        context.drawImage(bgImage, bg.x, bg.y);
     }
 
     if (shipReady) {

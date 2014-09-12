@@ -34,6 +34,14 @@ bulletImage.onload = function(){
 };
 bulletImage.src = "img/bullet.png";
 
+// asteroid image
+var asteroidReady = false;
+var asteroidImage = new Image();
+asteroidImage.onload = function(){
+    asteroidReady = true;
+};
+asteroidImage.src = "img/asteroid.png";
+
 // Handle keyboard controls
 var keysDown = {};
 
@@ -49,14 +57,22 @@ addEventListener("keyup", function (e) {
 // Game objects
 
 var bullets = [];
+var asteroids = [];
 
 var ship = {
 
     // Properties
     speed: 256, // movement speed
+    health: 100,
 
     // Methods
     update: function (modifier) {
+
+        var r = Math.random() * 100000;
+        if (r > 99370) {
+            var newAsteroid = asteroid.newAsteroid();
+            asteroids.push(newAsteroid);
+        }
 
         if (38 in keysDown) { // Player holding up
              if (40 in keysDown) { // Player holding down
@@ -92,7 +108,7 @@ var ship = {
 
 var bullet = {
 
-   move: function (bul){
+   bulMove: function (bul){
       bul.y -= bul.speed * 0.008;
    },
 
@@ -105,16 +121,40 @@ var bullet = {
     }
 };
 
-//function Asteroid(speed, endurance, direction, size){
-//    this.speed = 0.04;
-//    this.endurance = endurance;
-//    this.direction = direction;
-//    this.size = size;
-//}
+////{(speed, endurance, direction, size)
+
+var asteroid = {
+
+    rand: getRandomInt(1, 3),
+
+    newAsteroid: function() {
+        this.speed = 0.04;
+        this.health = this.rand;
+        this.size = this.rand;
+        this.x = getRandomInt(50, 800);
+        this.y = getRandomInt(1, 100);
+
+        return {x: this.x, y: this.y, speed: this.speed, health: this.health, size: this.size};
+    },
+
+    astMove: function(ast) {
+        ast.y += 1;
+    }
+};
 
 
 
 // FUNCTIONS
+
+//Random
+/**
+ * Returns a random integer between min (inclusive) and max (inclusive)
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 // Draw everything
 var render = function () {
     if (bgReady) {
@@ -127,8 +167,21 @@ var render = function () {
 
     if (bulletReady) {
         for (var i = 0; i < bullets.length; i++) {
+//            if (bullets[i].y < 0 && i > 1) {
+//                //delete bullets[i];
+//            }
             context.drawImage(bulletImage, bullets[i].x, bullets[i].y);
-            bullet.move(bullets[i]);
+            bullet.bulMove(bullets[i]);
+        }
+    }
+
+    if (asteroidReady) {
+        for (var i = 0; i < asteroids.length; i++) {
+//            if (asteroids[i].y > 600) {
+//                delete bullets[i];
+//            }
+            context.drawImage(asteroidImage, asteroids[i].x, asteroids[i].y);
+            asteroid.astMove(asteroids[i]);
         }
     }
 };

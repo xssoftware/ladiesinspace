@@ -76,6 +76,8 @@ var bullets = [];
 var asteroids = [];
 var enemies = [];
 var enemyBullets = [];
+var time = 120;
+var gap = 121;
 
 var ship = {
 
@@ -87,20 +89,31 @@ var ship = {
     update: function (modifier) {
 
         var r = Math.random() * 100000;
-        if (r > 99370) {
+
+        if (r > 99400) {
             var newAsteroid = asteroid.newAsteroid();
             asteroids.push(newAsteroid);
         }
 
-        if (r > 99270 && r < 99370) {
+        if (r > 98500 && r < 99370) {
             var newEnemy = enemy.newEnemy();
             enemies.push(newEnemy);
         }
 
-        for (var i = 0; i < enemies.length; i++) {
-            var newEnemyBul = bullet.newEnemyBullet(enemies[i]);
-            enemyBullets.push(newEnemyBul);
+        if (gap > time) {
+            for (var i = 0; i < enemies.length; i++) {
+                if (enemies[i].y < 900) {
+                    var newEnemyBul = bullet.newBullet(enemies[i].x + 20, enemies[i].y + 55);
+                    enemyBullets.push(newEnemyBul);
+                }
+            }
+            gap = 0;
         }
+        else {
+            gap++;
+        }
+
+       // console.log(enemyBullets);
 
         if (38 in keysDown) { // Player holding up
              if (40 in keysDown) { // Player holding down
@@ -122,7 +135,7 @@ var ship = {
 
         }
         if (32 in keysDown) {
-            var newBul = bullet.newBullet();
+            var newBul = bullet.newBullet(ship.x + 30, ship.y - 40);
             bullets.push(newBul);
         }
     },
@@ -130,38 +143,33 @@ var ship = {
     reset: function () {
         ship.x = canvas.width / 2;
         ship.y = canvas.height - canvas.height / 6;
+        ship.health = 100;
     }
 };
 
 
 var bullet = {
 
-   bulMove: function (bul){
-      bul.y -= bul.speed * 0.008;
+   bulMove: function (bul, dir){
+       if (dir == 1) {
+           bul.y -= bul.speed * 0.008;
+       }
+
+       if (dir == 2) {
+           bul.y += bul.speed * 0.007;
+       }
    },
 
-    enemyBulMove: function (bul){
-        bul.y += 85;
-    },
-
-    newBullet: function() {
-        this.x = ship.x + 30;
-        this.y = ship.y - 40;
+    newBullet: function(x, y) {
+        this.x = x;
+        this.y = y;
         this.speed = 256;
 
         return {x: this.x, y: this.y, speed: this.speed};
-    },
-
-    newEnemyBullet: function(enemy) {
-        this.x = enemy.x + 30;
-        this.y = enemy.y - 40;
-        this.speed = 256;
-
-        return {x: this.x, y: this.y, speed: this.speed};
-    }
+        }
 };
 
-////{(speed, endurance, direction, size)
+//{(speed, endurance, direction, size)
 
 var asteroid = {
 
@@ -172,7 +180,7 @@ var asteroid = {
         this.health = this.rand;
         this.size = this.rand;
         this.x = getRandomInt(50, 800);
-        this.y = getRandomInt(1, 100);
+        this.y = getRandomInt(1, 20);
 
         return {x: this.x, y: this.y, speed: this.speed, health: this.health, size: this.size};
     },
@@ -191,7 +199,7 @@ var enemy = {
         this.health = this.rand;
         this.size = this.rand;
         this.x = getRandomInt(50, 800);
-        this.y = getRandomInt(1, 100);
+        this.y = getRandomInt(1, 20);
 
         return {x: this.x, y: this.y, speed: this.speed, health: this.health, size: this.size};
     },
@@ -230,7 +238,7 @@ var render = function () {
 //                //delete bullets[i];
 //            }
             context.drawImage(bulletImage, bullets[i].x, bullets[i].y);
-            bullet.bulMove(bullets[i]);
+            bullet.bulMove(bullets[i], 1);
         }
     }
 
@@ -256,11 +264,8 @@ var render = function () {
 
     if (enemyBulletReady) {
         for (var i = 0; i < enemyBullets.length; i++) {
-//            if (bullets[i].y < 0 && i > 1) {
-//                //delete bullets[i];
-//            }
             context.drawImage(enemyBulletImage, enemyBullets[i].x, enemyBullets[i].y);
-            bullet.enemyBulMove(enemyBullets[i]);
+            bullet.bulMove(enemyBullets[i], 2);
         }
     }
 };
@@ -268,13 +273,8 @@ var render = function () {
 //detect collision between two objects
 function detectCollision(firstObj, secondObj)
 {
-    if ((firstObj.x <= secondObj.x && firstObj.x + 32 >= secondObj.x) &&
-        (firstObj.y <= secondObj.y && secondObj.y + 32 >= secondObj)) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return ((firstObj.x <= secondObj.x && firstObj.x + 32 >= secondObj.x) &&
+        (firstObj.y <= secondObj.y && secondObj.y + 32 >= secondObj));
 }
 
 

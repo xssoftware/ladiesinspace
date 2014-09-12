@@ -31,30 +31,8 @@ var bulletReady = false;
 var bulletImage = new Image();
 bulletImage.onload = function(){
   bulletReady = true;
-}
+};
 bulletImage.src = "img/bullet.png";
-
-
-// class Asteroid
-function Asteroid(speed, endurance, direction, size){
-  this.speed = speed;
-  this.endurance = endurance;
-  this.direction = direction;
-  this.size = size;
-}
-
-//class Bullet
-function Bullet(){
-  // bullet coordinates
-  this.x = ship.x + 30;
-  this.y = ship.y - 10;
-
-  this.speed = 250;
-  this.move = function(modifier){
-    this.y -= this.speed * modifier;
-  }
-} // to be continue
-
 
 // Handle keyboard controls
 var keysDown = {};
@@ -69,6 +47,9 @@ addEventListener("keyup", function (e) {
 
 
 // Game objects
+
+var bullets = [];
+
 var ship = {
 
     // Properties
@@ -96,28 +77,42 @@ var ship = {
             ship.x += ship.speed * modifier;
 
         }
+        if (32 in keysDown) {
+            var newBul = bullet.newBullet();
+            bullets.push(newBul);
+        }
     },
+
     reset: function () {
         ship.x = canvas.width / 2;
         ship.y = canvas.height - canvas.height / 6;
     }
 };
 
-// bullet objects
-var bullets = [], i = 0;
-  // create bullets
-var createBullets = function(){
-  if(66 in keysDown){
-    if(bulletReady){
-      bullets[i] = new Bullet();
+
+var bullet = {
+
+   move: function (bul){
+      bul.y -= bul.speed * 0.008;
+   },
+
+    newBullet: function() {
+        this.x = ship.x + 30;
+        this.y = ship.y - 40;
+        this.speed = 256;
+
+        return {x: this.x, y: this.y, speed: this.speed};
     }
-    context.drawImage(bulletImage, bullets[i].x, bullets[i].y);
-    console.log(bullets[i].x, bullets[i].y);
-      console.log(bullets);
-    bullets[i].move();
-    i++;
-  }
-}
+};
+
+//function Asteroid(speed, endurance, direction, size){
+//    this.speed = 0.04;
+//    this.endurance = endurance;
+//    this.direction = direction;
+//    this.size = size;
+//}
+
+
 
 // FUNCTIONS
 // Draw everything
@@ -128,6 +123,13 @@ var render = function () {
 
     if (shipReady) {
         context.drawImage(shipImage, ship.x, ship.y);
+    }
+
+    if (bulletReady) {
+        for (var i = 0; i < bullets.length; i++) {
+            context.drawImage(bulletImage, bullets[i].x, bullets[i].y);
+            bullet.move(bullets[i]);
+        }
     }
 };
 
@@ -151,7 +153,7 @@ var main = function () {
 
     ship.update(delta / 1000);
     render();
-    createBullets();
+
 
     then = now;
 

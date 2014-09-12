@@ -245,24 +245,64 @@ var asteroid = {
             asteroids.push(newAsteroid);
         }
 
+        var small = [],
+            medium = [];
+
        for (var i = bullets.length - 1; i >= 0; i--) {
            for (var j = asteroids.length - 1; j >= 0; j--) {
-               if (map.collision(bullets[i], asteroids[j], 7, 14) && asteroids[j].size <= 10) {
+               if (map.collision(bullets[i], asteroids[j], 32, 32) && asteroids[j].size <= 10) {
                    asteroids.splice(j, 1);
                    bullets.splice(i, 1);
                }
 
-               else if (map.collision(bullets[i], asteroids[j], 7, 14) && asteroids[j].size > 10 && asteroids[j].size <= 20) {
-                   asteroids.splice(j, 1);
+               else if (map.collision(bullets[i], asteroids[j], 50, 50) && asteroids[j].size > 10 && asteroids[j].size <= 20) {
+                   small.push(j);
                    bullets.splice(i, 1);
                }
 
-               else if (map.collision(bullets[i], asteroids[j], 7, 14) && asteroids[j].size > 20 && asteroids[j].size <= 30) {
-                   asteroids.splice(j, 1);
+               else if (map.collision(bullets[i], asteroids[j], 64, 64) && asteroids[j].size > 20 && asteroids[j].size <= 30) {
+                   medium.push(j);
                    bullets.splice(i, 1);
                }
            }
        }
+
+        if (small.length > 0) {
+            for (var s = small.length - 1; s >= 0; s--) {
+                if (asteroids[small[s]] != undefined) {
+                    var x = asteroids[small[s]].x;
+                    var y = asteroids[small[s]].y;
+                    var obj = asteroid.newAsteroid();
+                    obj.x = x;
+                    obj.y = y;
+                    obj.size = 5;
+                    obj.image = smallImage;
+                    asteroids.splice(small[i], 1);
+                    asteroids.push(obj);
+                    obj.x = obj.x + 100;
+                    asteroids.push(obj);
+                }
+            }
+        }
+
+
+        if (medium.length > 0) {
+            for (var s = medium.length - 1; s >= 0; s--) {
+                if (asteroids[medium[s]] != undefined) {
+                    x = asteroids[medium[s]].x;
+                    y = asteroids[medium[s]].y;
+                    obj = asteroid.newAsteroid();
+                    obj.x = x;
+                    obj.y = y;
+                    obj.size = 15;
+                    obj.image = middleImage;
+                    asteroids.splice(medium[i], 1);
+                    asteroids.push(obj);
+                    obj.x = obj.x + 100;
+                    asteroids.push(obj);
+                }
+            }
+        }
    }
 };
 
@@ -307,7 +347,9 @@ var enemy = {
 var map = {
     collision: function (firstObj, secondObj, w, h)
     {
-        return (firstObj.y <= secondObj.y + 65 && firstObj.x >= secondObj.x);
+        if (firstObj != undefined && secondObj != undefined) {
+            return (firstObj.y <= secondObj.y + h && firstObj.x <= secondObj.x);
+        }
     },
 
     borders: function () {
@@ -334,18 +376,22 @@ function getRandomInt(min, max) {
 // Draw everything
 
 function draw (obj, input) {
-    for (var i = 0; i < input.length; i++) {
-        if (input[i].y > 600 && input[i].dir == 2) {
-            input.splice(i, 1);
-        }
+    if (input.length > 0) {
+        for (var i = 0; i < input.length; i++) {
+            if (input[i].y > 600 && input[i].dir == 2 && input[i] != undefined) {
+                input.splice(i, 1);
+            }
 
-        else if (input[i].y < 0 && input[i].dir == 1) {
-            input.splice(i, 1);
-        }
+            else if (input[i].y < 0 && input[i].dir == 1 && input[i] != undefined) {
+                input.splice(i, 1);
+            }
 
-        else {
-            context.drawImage(input[i].image, input[i].x, input[i].y);
-            obj.move(input[i], input[i].dir);
+            else {
+                if (input[i] != undefined) {
+                    context.drawImage(input[i].image, input[i].x, input[i].y);
+                    obj.move(input[i], input[i].dir);
+                }
+            }
         }
     }
 }
@@ -372,7 +418,7 @@ var render = function () {
         draw (bullet, bullets);
     }
 
-    if (smallReady || middleReady || bigReady) {
+    if (smallReady && middleReady && bigReady) {
         draw (asteroid, asteroids);
     }
 

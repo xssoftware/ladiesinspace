@@ -50,13 +50,37 @@ enemyImage.onload = function(){
 };
 enemyImage.src = "img/enemy.png";
 
-// asteroid image
-var asteroidReady = false;
-var asteroidImage = new Image();
-asteroidImage.onload = function(){
-    asteroidReady = true;
+// asteroid images
+//var asteroidReady = false;
+//var asteroidImage = new Image();
+//asteroidImage.onload = function(){
+//    asteroidReady = true;
+//};
+////asteroidImage.src = "img/big.png";
+
+// big asteroid image
+var bigReady = false;
+var bigImage = new Image();
+bigImage.onload = function(){
+    bigReady = true;
 };
-asteroidImage.src = "img/asteroid.png";
+bigImage.src = "img/big.png";
+
+// middle asteroid image
+var middleReady = false;
+var middleImage = new Image();
+middleImage.onload = function(){
+    middleReady = true;
+};
+middleImage.src = "img/middle.png";
+
+// small asteroid image
+var smallReady = false;
+var smallImage = new Image();
+smallImage.onload = function(){
+    smallReady = true;
+};
+smallImage.src = "img/small.png";
 
 // Handle keyboard controls
 var keysDown = {};
@@ -96,14 +120,14 @@ var ship = {
     update: function (modifier) {
 
         if (38 in keysDown) { // Player holding up
-             if (40 in keysDown) { // Player holding down
-                 bg.y += ship.speed * modifier / 4.5;
-                 bg.nextY += ship.speed * modifier / 4.5;
-             }
-             else {
+            if (40 in keysDown) { // Player holding down
+                bg.y += ship.speed * modifier / 4.5;
+                bg.nextY += ship.speed * modifier / 4.5;
+            }
+            else {
                 bg.y += ship.speed * modifier;
                 bg.nextY += ship.speed * modifier;
-             }
+            }
         }
         if (40 in keysDown) { // Player holding down
             bg.y += ship.speed * modifier / 4.5;
@@ -119,7 +143,7 @@ var ship = {
         }
         if (32 in keysDown) {
             if (ship.gap > ship.time) {
-                var newBul = bullet.newBullet(ship.x + 30, ship.y - 40);
+                var newBul = bullet.newBullet(ship.x + 30, ship.y - 40, 1);
                 bullets.push(newBul);
                 ship.gap = 0;
             } else {
@@ -142,29 +166,36 @@ var bullet = {
     time: 120,
     gap: 70,
 
-    newBullet: function(x, y) {
+    newBullet: function(x, y, dir) {
         this.x = x;
         this.y = y;
         this.speed = 256;
+        this.dir = dir;
 
-        return {x: this.x, y: this.y, speed: this.speed};
+        if (dir == 1) {
+            this.image = bulletImage;
+        } else {
+            this.image = enemyBulletImage;
+        }
+
+        return {x: this.x, y: this.y, speed: this.speed, image: this.image, dir: this.dir};
     },
 
-   move: function (bul, dir){
-       if (dir == 1) {
-           bul.y -= bul.speed * 0.008;
-       }
+    move: function (bul){
+        if (bul.dir == 1) {
+            bul.y -= bul.speed * 0.008;
+        }
 
-       if (dir == 2) {
-           bul.y += bul.speed * 0.007;
-       }
-   },
+        if (bul.dir == 2) {
+            bul.y += bul.speed * 0.007;
+        }
+    },
 
     update: function() {
         if (bullet.gap > bullet.time) {
             for (var i = 0; i < enemies.length; i++) {
                 if (enemies[i].y < 900) {
-                    var newEnemyBul = bullet.newBullet(enemies[i].x + 20, enemies[i].y + 55);
+                    var newEnemyBul = bullet.newBullet(enemies[i].x + 20, enemies[i].y + 55, 2);
                     enemyBullets.push(newEnemyBul);
                 }
             }
@@ -180,15 +211,27 @@ var bullet = {
 
 var asteroid = {
 
-    rand: getRandomInt(1, 3),
-
     newAsteroid: function() {
-        this.health = this.rand;
-        this.size = this.rand;
+        var rand = getRandomInt(1, 30);
+        this.health = getRandomInt(1, 30);
+        this.size = getRandomInt(1, 30);
         this.x = getRandomInt(50, 800);
         this.y = getRandomInt(1, 20);
+        this.dir = 2;
 
-        return {x: this.x, y: this.y, health: this.health, size: this.size};
+       if (rand <= 10) {
+           this.image = smallImage;
+       }
+
+       if (rand > 10 && rand <= 20) {
+           this.image = middleImage;
+       }
+
+       if (rand > 20 && rand <= 30) {
+           this.image = bigImage;
+       }
+
+        return {x: this.x, y: this.y, health: this.health, size: this.size, image: this.image, dir: this.dir};
     },
 
     move: function(ast) {
@@ -198,7 +241,7 @@ var asteroid = {
     update: function () {
         var r = Math.random() * 100000;
 
-        if (r > 99700) {
+        if (r > 98700) {
             var newAsteroid = asteroid.newAsteroid();
             asteroids.push(newAsteroid);
         }
@@ -211,8 +254,10 @@ var enemy = {
         this.health = 1;
         this.x = getRandomInt(50, 800);
         this.y = getRandomInt(1, 20);
+        this.image = enemyImage;
+        this.dir = 2;
 
-        return {x: this.x, y: this.y, health: this.health};
+        return {x: this.x, y: this.y, health: this.health, image: this.image, dir: this.dir};
     },
 
     move: function(enemy) {
@@ -222,11 +267,11 @@ var enemy = {
     update: function() {
         var r = Math.random() * 100000;
 
-        if (r > 99200 && r < 99370) {
+        if (r > 98200 && r < 99370) {
             var newEnemy = enemy.newEnemy();
             enemies.push(newEnemy);
 
-            var newEnemyBul = bullet.newBullet(enemies[enemies.length - 1].x + 20, enemies[enemies.length - 1].y + 55);
+            var newEnemyBul = bullet.newBullet(enemies[enemies.length - 1].x + 20, enemies[enemies.length - 1].y + 55, 2);
             enemyBullets.push(newEnemyBul);
         }
 
@@ -234,6 +279,7 @@ var enemy = {
             for (var j = 0; j < enemies.length; j++) {
                 if (map.collision(bullets[i], enemies[j], 7, 14)) {
                     enemies.splice(j, 1);
+                    bullets.splice(i, 1);
                 }
             }
         }
@@ -269,14 +315,13 @@ function getRandomInt(min, max) {
 
 // Draw everything
 
-function draw (obj, image, input, dir) {
+function draw (obj, input) {
     for (var i = 0; i < input.length; i++) {
         if (input[i].y > 600) {
             input.splice(i, 1);
-            console.log(input.length)
         } else {
-            context.drawImage(image, input[i].x, input[i].y);
-            obj.move(input[i], dir);
+            context.drawImage(input[i].image, input[i].x, input[i].y);
+            obj.move(input[i], input[i].dir);
         }
     }
 }
@@ -300,21 +345,19 @@ var render = function () {
     }
 
     if (bulletReady) {
-        draw (bullet, bulletImage, bullets, 1);
+        draw (bullet, bullets);
     }
 
-    if (asteroidReady) {
-        console.log (asteroids.length);
-        draw (asteroid, asteroidImage, asteroids, 2);
-        console.log (asteroids.length);
+    if (smallReady || middleReady || bigReady) {
+        draw (asteroid, asteroids);
     }
 
     if (enemyReady) {
-        draw (enemy, enemyImage, enemies, 2);
+        draw (enemy, enemies);
     }
 
     if (enemyBulletReady) {
-        draw (bullet, enemyBulletImage, enemyBullets, 2);
+        draw (bullet, enemyBullets);
     }
 };
 

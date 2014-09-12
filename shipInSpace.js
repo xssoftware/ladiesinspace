@@ -230,21 +230,10 @@ var enemy = {
             enemyBullets.push(newEnemyBul);
         }
 
-        if (bullets.length <= enemies.length) {
-            for (var i = 0; i < bullets.length; i++) {
-                for (var j = 0; j < enemies.length; j++) {
-                    if (map.collision(bullets[i], enemies[j], 7, 14)) {
-                        enemies.splice(j, 1);
-                    }
-                }
-            }
-        }
-        else {
-            for (var i = 0; i < enemies.length; i++) {
-                for (var j = 0; j < bullets.length; j++) {
-                    if (map.collision(bullets[j], enemies[i], 7, 14)) {
-                        enemies.splice(i, 1);
-                    }
+        for (var i = 0; i < bullets.length; i++) {
+            for (var j = 0; j < enemies.length; j++) {
+                if (map.collision(bullets[i], enemies[j], 7, 14)) {
+                    enemies.splice(j, 1);
                 }
             }
         }

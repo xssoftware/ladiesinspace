@@ -77,7 +77,7 @@ var asteroids = [];
 var enemies = [];
 var enemyBullets = [];
 var time = 120;
-var gap = 121;
+var gap = 70;
 
 var ship = {
 
@@ -90,20 +90,22 @@ var ship = {
 
         var r = Math.random() * 100000;
 
-        if (r > 99400) {
+        if (r > 99700) {
             var newAsteroid = asteroid.newAsteroid();
             asteroids.push(newAsteroid);
         }
 
-        if (r > 98500 && r < 99370) {
+        if (r > 99200 && r < 99370) {
             var newEnemy = enemy.newEnemy();
             enemies.push(newEnemy);
+            var newEnemyBul = bullet.newBullet(enemies[enemies.length - 1].x + 20, enemies[enemies.length - 1].y + 55);
+            enemyBullets.push(newEnemyBul);
         }
 
         if (gap > time) {
             for (var i = 0; i < enemies.length; i++) {
                 if (enemies[i].y < 900) {
-                    var newEnemyBul = bullet.newBullet(enemies[i].x + 20, enemies[i].y + 55);
+                    newEnemyBul = bullet.newBullet(enemies[i].x + 20, enemies[i].y + 55);
                     enemyBullets.push(newEnemyBul);
                 }
             }

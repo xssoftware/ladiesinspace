@@ -275,11 +275,11 @@ var enemy = {
             enemyBullets.push(newEnemyBul);
         }
 
-        for (var i = 0; i < bullets.length; i++) {
-            for (var j = 0; j < enemies.length; j++) {
+        for (var i = bullets.length - 1; i >= 0; i--) {
+            for (var j = enemies.length - 1; j >= 0; j--) {
                 if (map.collision(bullets[i], enemies[j], 7, 14)) {
-                    enemies.splice(j, 1);
-                    bullets.splice(i, 1);
+                    enemies.splice (j, 1);
+                    bullets.splice (i, 1);
                 }
             }
         }
@@ -289,7 +289,7 @@ var enemy = {
 var map = {
     collision: function (firstObj, secondObj, w, h)
     {
-        return (firstObj.y <= secondObj.y + 65 );
+        return (firstObj.y <= secondObj.y + 65 && firstObj.x >= secondObj.x);
     },
 
     borders: function () {

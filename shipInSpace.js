@@ -243,8 +243,7 @@ var enemy = {
 var map = {
     collision: function (firstObj, secondObj, w, h)
     {
-        return ((firstObj.x <= secondObj.x && firstObj.x + w >= secondObj.x) &&
-            (firstObj.y <= secondObj.y && secondObj.y + h >= secondObj));
+        return (firstObj.y <= secondObj.y + 65 );
     },
 
     borders: function () {

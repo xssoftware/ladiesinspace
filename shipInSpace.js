@@ -274,13 +274,17 @@ var asteroid = {
                     var x = asteroids[small[s]].x;
                     var y = asteroids[small[s]].y;
                     var obj = asteroid.newAsteroid();
-                    obj.x = x - 50;
+                    obj.x = x - 40;
                     obj.y = y;
-                    obj.size = 15;
+                    obj.size = 5;
                     obj.image = smallImage;
-                    delete asteroids[small[i]]; //= false;
+                    asteroids.splice(small[s] + i + 1, 1); //= false;
                     asteroids.push(obj);
-                    obj.x = obj.x + 100;
+                    obj = asteroid.newAsteroid();
+                    obj.x = x + 40;
+                    obj.y = y;
+                    obj.size = 5;
+                    obj.image = smallImage;
                     asteroids.push(obj);
                 }
             }
@@ -293,21 +297,19 @@ var asteroid = {
                     var x = asteroids[medium[s]].x;
                     var y = asteroids[medium[s]].y;
                     var obj = asteroid.newAsteroid();
-                    obj.x = x - 50;
+                    obj.x = x - 60;
                     obj.y = y;
                     obj.size = 15;
                     obj.image = middleImage;
-                    delete asteroids[medium[i]]; //= false;
+                    asteroids.splice(medium[s] + i + 1, 1); //= false;
                     asteroids.push(obj);
-                    obj.x = obj.x + 100;
+                    obj = asteroid.newAsteroid();
+                    obj.x = x + 60;
+                    obj.y = y;
+                    obj.size = 15;
+                    obj.image = middleImage;
                     asteroids.push(obj);
                 }
-            }
-        }
-
-        for (var i = asteroids.length - 1; i > 0; i--) {
-            if (asteroids[i] == undefined) {
-                asteroids.splice(i, 1);
             }
         }
    }

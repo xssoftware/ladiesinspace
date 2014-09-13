@@ -136,7 +136,7 @@ var ship = {
     gap: 13,
     collisionTime: 25,
     collisionGap: 26,
-    lives: 0,
+    lives: 3,
 
     // Methods
 
@@ -329,7 +329,7 @@ var asteroid = {
         if (rand <= 10) {
             this.health = 0;
         } else {
-            this.health = map.randomInteger(1, 5);
+            this.health = map.randomInteger(1, 3);
         }
 
         if (rand <= 10) {

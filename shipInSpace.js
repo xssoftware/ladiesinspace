@@ -213,24 +213,37 @@ var asteroid = {
 
     newAsteroid: function() {
         var rand = getRandomInt(1, 30);
+        var x = getRandomInt(50, 800);
+        var y = getRandomInt(1, 20);
+
+        if (checkForObjects(x, y, enemies) && checkForObjects(x, y, asteroids)) {
+            this.x = x;
+            this.y = y;
+        }
+
         this.size = rand;
-        this.x = getRandomInt(50, 800);
-        this.y = getRandomInt(1, 20);
+
+        if (rand < 10) {
+            this.health = 0;
+        } else {
+            this.health = getRandomInt(1, 5);
+        }
+
         this.dir = 2;
 
-       if (rand <= 10) {
-           this.image = smallImage;
-       }
+        if (rand <= 10) {
+            this.image = smallImage;
+        }
 
-       if (rand > 10 && rand <= 20) {
-           this.image = middleImage;
-       }
+        if (rand > 10 && rand <= 20) {
+            this.image = middleImage;
+        }
 
-       if (rand > 20 && rand <= 30) {
-           this.image = bigImage;
-       }
+        if (rand > 20 && rand <= 30) {
+            this.image = bigImage;
+        }
 
-        return {x: this.x, y: this.y, health: this.health, size: this.size, image: this.image, dir: this.dir};
+         return {x: this.x, y: this.y, health: this.health, size: this.size, image: this.image, dir: this.dir};
     },
 
     move: function(ast) {
@@ -240,7 +253,7 @@ var asteroid = {
     update: function () {
         var r = Math.random() * 100000;
 
-        if (r > 98700) {
+        if (r > 99250) {
             var newAsteroid = asteroid.newAsteroid();
             asteroids.push(newAsteroid);
         }
@@ -270,22 +283,26 @@ var asteroid = {
 
         if (small.length > 0) {
             for (var s = small.length - 1; s >= 0; s--) {
-                if (asteroids[small[s]] != undefined) {
+                if (asteroids[small[s]] != undefined && asteroids[small[s]].health == 0) {
                     var x = asteroids[small[s]].x;
                     var y = asteroids[small[s]].y;
-                    var obj = asteroid.newAsteroid();
-                    obj.x = x - 40;
-                    obj.y = y;
+                    obj = asteroid.newAsteroid();
+                    obj.x = x - 30;
+                    obj.y = y + 5;
                     obj.size = 5;
                     obj.image = smallImage;
                     asteroids.splice(small[s] + i + 1, 1); //= false;
                     asteroids.push(obj);
                     obj = asteroid.newAsteroid();
-                    obj.x = x + 40;
-                    obj.y = y;
+                    obj.x = x + 30;
+                    obj.y = y + 5;
                     obj.size = 5;
                     obj.image = smallImage;
                     asteroids.push(obj);
+                }
+
+                else {
+                    asteroids[small[s]].health--;
                 }
             }
         }
@@ -293,22 +310,26 @@ var asteroid = {
 
         if (medium.length > 0) {
             for (var s = medium.length - 1; s >= 0; s--) {
-                if (asteroids[medium[s]] != undefined) {
+                if (asteroids[medium[s]] != undefined && asteroids[medium[s]].health == 0) {
                     var x = asteroids[medium[s]].x;
                     var y = asteroids[medium[s]].y;
-                    var obj = asteroid.newAsteroid();
-                    obj.x = x - 60;
-                    obj.y = y;
+                    obj = asteroid.newAsteroid();
+                    obj.x = x - 50;
+                    obj.y = y + 5;
                     obj.size = 15;
                     obj.image = middleImage;
                     asteroids.splice(medium[s] + i + 1, 1); //= false;
                     asteroids.push(obj);
                     obj = asteroid.newAsteroid();
-                    obj.x = x + 60;
-                    obj.y = y;
+                    obj.x = x + 50;
+                    obj.y = y + 5;
                     obj.size = 15;
                     obj.image = middleImage;
                     asteroids.push(obj);
+                }
+
+                else {
+                    asteroids[medium[s]].health--;
                 }
             }
         }
@@ -318,11 +339,15 @@ var asteroid = {
 var enemy = {
 
     newEnemy: function() {
-
-        this.x = getRandomInt(50, 800);
-        this.y = getRandomInt(1, 20);
+        var x = getRandomInt(50, 800);
+        var y = getRandomInt(1, 20);
+        if (checkForObjects(x, y, enemies) && checkForObjects(x, y, asteroids)) {
+            this.x = x;
+            this.y = y;
+        }
         this.image = enemyImage;
         this.dir = 2;
+        this.health = 2;
 
         return {x: this.x, y: this.y, health: this.health, image: this.image, dir: this.dir};
     },
@@ -334,7 +359,7 @@ var enemy = {
     update: function() {
         var r = Math.random() * 100000;
 
-        if (r > 98200 && r < 99370) {
+        if (r > 99250 && r < 99470) {
             var newEnemy = enemy.newEnemy();
             enemies.push(newEnemy);
 
@@ -345,8 +370,13 @@ var enemy = {
         for (var i = bullets.length - 1; i >= 0; i--) {
             for (var j = enemies.length - 1; j >= 0; j--) {
                 if (map.collision(bullets[i], enemies[j], 50, 50)) {
-                    enemies.splice (j, 1);
-                    bullets.splice (i, 1);
+                    if ( enemies[j].health == 0) {
+                        enemies.splice(j, 1);
+                        bullets.splice(i, 1);
+                    } else {
+                        enemies[j].health--;
+                        bullets.splice(i, 1);
+                    }
                 }
             }
         }
@@ -380,6 +410,17 @@ var map = {
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function checkForObjects (x, y,  arr1) {
+    var check = true;
+    var o = {x: x, y: y};
+
+    for (var i = 0; i < arr1.length; i++) {
+        check = check && !map.collision(o, arr1[i], 65, 65);
+    }
+
+    return check;
 }
 
 // Draw everything

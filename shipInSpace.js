@@ -137,7 +137,7 @@ var ship = {
     collisionTime: 25,
     collisionGap: 26,
     lives: 3,
-
+    score: 0,
     // Methods
 
     modifySpeed: function (mod) {
@@ -151,7 +151,6 @@ var ship = {
             if (arr[i].size < 10) {
                 if (map.collision(ship, arr[i])) {
                     ship.health -= 5;
-                    arr[i].health = 50;
                 }
             }
 
@@ -227,7 +226,7 @@ var ship = {
 
         if (ship.health == 0) {
 
-            if (ship.lives > 0) {
+            if (ship.lives > 1) {
                 ship.reset();
                 ship.lives--;
             }
@@ -258,6 +257,7 @@ var bullet = {
 
     time: 120,
     gap: 70,
+    border: 70,
 
     newBullet: function(x, y, dir) {
         this.x = x;
@@ -396,6 +396,14 @@ var asteroid = {
             for (var s = arr.length - 1; s >= 0; s--) {
 
                 if (asteroids[arr[s]] != undefined && asteroids[arr[s]].health == 0) {
+                    if (asteroids[arr[s]].size > 10 && asteroids[arr[s]].size <= 20) {
+                        ship.score += 15;
+                    }
+
+                    if (asteroids[arr[s]].size > 20 && asteroids[arr[s]].size <= 30) {
+                        ship.score += 20;
+                    }
+
                     var temp = asteroids[arr[s]];
                     asteroids.splice(arr[s] + s, 1);
                     asteroids.push(this.tempObj(temp));
@@ -404,6 +412,14 @@ var asteroid = {
 
                 else {
                     asteroids[arr[s]].health--;
+
+                    if (asteroids[arr[s]].size > 10 && asteroids[arr[s]].size <= 20) {
+                        ship.score += 3;
+                    }
+
+                    if (asteroids[arr[s]].size > 20 && asteroids[arr[s]].size <= 30) {
+                        ship.score += 5;
+                    }
                 }
             }
         }
@@ -427,19 +443,22 @@ var asteroid = {
         for (var i = bullets.length - 1; i >= 0; i--) {
             for (var j = asteroids.length - 1; j >= 0; j--) {
 
-                if (map.collision(bullets[i], asteroids[j]) && asteroids[j].size <= 10) {
-                    asteroids.splice(j, 1);
-                    bullets.splice(i, 1);
-                }
+                if (bullets[i].y > bullet.border) {
+                    if (map.collision(bullets[i], asteroids[j]) && asteroids[j].size <= 10) {
+                        ship.score += 10;
+                        asteroids.splice(j, 1);
+                        bullets.splice(i, 1);
+                    }
 
-                else if (map.collision(bullets[i], asteroids[j]) && asteroids[j].size > 10 && asteroids[j].size <= 20) {
-                    small.push(j);
-                    bullets.splice(i, 1);
-                }
+                    else if (map.collision(bullets[i], asteroids[j]) && asteroids[j].size > 10 && asteroids[j].size <= 20) {
+                        small.push(j);
+                        bullets.splice(i, 1);
+                    }
 
-                else if (map.collision(bullets[i], asteroids[j]) && asteroids[j].size > 20 && asteroids[j].size <= 30) {
-                    medium.push(j);
-                    bullets.splice(i, 1);
+                    else if (map.collision(bullets[i], asteroids[j]) && asteroids[j].size > 20 && asteroids[j].size <= 30) {
+                        medium.push(j);
+                        bullets.splice(i, 1);
+                    }
                 }
             }
         }
@@ -492,13 +511,17 @@ var enemy = {
         for (var i = bullets.length - 1; i >= 0; i--) {
             for (var j = enemies.length - 1; j >= 0; j--) {
 
-                if (map.collision(bullets[i], enemies[j], 50, 50)) {
-                    if ( enemies[j].health == 0) {
-                        enemies.splice(j, 1);
-                        bullets.splice(i, 1);
-                    } else {
-                        enemies[j].health--;
-                        bullets.splice(i, 1);
+                if (bullets[i].y > bullet.border) {
+                    if (map.collision(bullets[i], enemies[j], 50, 50)) {
+                        if (enemies[j].health == 0) {
+                            ship.score += 15;
+                            enemies.splice(j, 1);
+                            bullets.splice(i, 1);
+                        } else {
+                            ship.score += 5;
+                            enemies[j].health--;
+                            bullets.splice(i, 1);
+                        }
                     }
                 }
             }
@@ -629,9 +652,11 @@ var map = {
             context.textAlign = "left";
             context.fillText("lives: " + ship.lives, 50, 30);
             context.fillText("health: " + ship.health, 200, 30);
+            context.fillText("score: " + ship.score, 400, 30);
         }
 
         else if (end == true) {
+            //ship.score = 0;
             //window.location.href = "begin.html";
             context.fillRect(0,0,canvas.width,canvas.height);
             context.fillStyle = "red";

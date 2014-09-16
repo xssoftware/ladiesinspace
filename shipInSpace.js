@@ -226,7 +226,7 @@ var ship = {
 
         if (ship.health == 0) {
 
-            if (ship.lives > 1) {
+            if (ship.lives > 0) {
                 ship.reset();
                 ship.lives--;
             }
@@ -514,6 +514,10 @@ var enemy = {
 
         for (var i = bullets.length - 1; i >= 0; i--) {
             for (var j = enemies.length - 1; j >= 0; j--) {
+
+                if(typeof bullets[i] == "undefined"){
+                    continue;
+                }
 
                 if (bullets[i].y > bullet.border) {
                     if (map.collision(bullets[i], enemies[j], 50, 50)) {

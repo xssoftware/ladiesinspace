@@ -443,6 +443,10 @@ var asteroid = {
         for (var i = bullets.length - 1; i >= 0; i--) {
             for (var j = asteroids.length - 1; j >= 0; j--) {
 
+              if(typeof bullets[i] == "undefined"){
+                continue;
+              }
+
                 if (bullets[i].y > bullet.border) {
                     if (map.collision(bullets[i], asteroids[j]) && asteroids[j].size <= 10) {
                         ship.score += 10;

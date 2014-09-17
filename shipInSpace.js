@@ -5,6 +5,7 @@ var canvas = document.createElement("canvas"),
 context.fillStyle = "black";
 context.strokeStyle = "red";
 
+canvas.setAttribute("class", "canvasss");
 canvas.width = 900;
 canvas.height = 600;
 canvas.style.border = "1px solid black";
@@ -224,7 +225,7 @@ var ship = {
             ship.collisionGap++;
         }
 
-        if (ship.health == 0) {
+        if (ship.health <= 0) {
 
             if (ship.lives > 1) {
                 ship.reset();
@@ -535,6 +536,32 @@ var enemy = {
 
 var map = {
 
+    startScreen: function(){
+      function centerText(context, text, y) {
+        var measurement = context.measureText(text);
+        var x = (context.canvas.width - measurement.width) / 2;
+        context.fillText(text, x, y);
+      }
+
+      context.fillStyle = "black";
+      context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+
+      context.fillStyle = "white";
+      context.font = "48px monospace";
+      centerText(context, "Ship in space", canvas.height / 2);
+
+      context.fillStyle = "blue";
+      context.font = "24px monospace";
+      centerText(context, "click to begin", canvas.height / 2 + 40);
+
+      $(".canvasss").on("click", function(){
+        console.log("clickkk");
+        var then = Date.now();
+        ship.reset();
+        main();
+      });
+    },
+
     collision: function (firstObj, secondObj) {
 
         if (firstObj != undefined && secondObj != undefined) {
@@ -577,8 +604,8 @@ var map = {
     },
 
     //Random
-//Returns a random integer between min (inclusive) and max (inclusive)
-//Using Math.round() will give you a non-uniform distribution!
+    //Returns a random integer between min (inclusive) and max (inclusive)
+    //Using Math.round() will give you a non-uniform distribution!
 
     randomInteger: function (min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -667,17 +694,16 @@ var map = {
             context.font = "20px Helvetica bold";
             context.textAlign = "left";
             context.fillText("Game Over", 400, 300);
-//           for (var i = 0; i < 100000000000; i++) {
-//               if (i == 99999999) {
-//                   window.location.href = "begin.html";
-//               }
-//           }
+            // for (var i = 0; i < 100000000000; i++) {
+            //   if (i == 99999999) {
+            //     window.location.href = "begin.html";
+            //   }
+            // }
         }
     }
 };
 
 // The main game loop
-
 var main = function () {
 
     var now = Date.now(),
@@ -696,5 +722,4 @@ var main = function () {
 };
 
 var then = Date.now();
-ship.reset();
-main();
+map.startScreen();

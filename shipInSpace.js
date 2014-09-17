@@ -227,7 +227,7 @@ var ship = {
 
         if (ship.health <= 0) {
 
-            if (ship.lives > 0) {
+            if (ship.lives > 1) {
                 ship.reset();
                 ship.lives--;
             }
